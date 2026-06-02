@@ -231,8 +231,11 @@ def do_upload(push_to, sub_folder_name, pending):
 # ===================================================
 @app.route("/callback", methods=["POST"])
 def callback():
-    signature = request.headers["X-Line-Signature"]
+    signature = request.headers.get("X-Line-Signature", "")
     body = request.get_data(as_text=True)
+    # LINE Verify ส่ง body ว่าง — ให้ผ่านได้เลย
+    if not body or body == "{}":
+        return "OK", 200
     try:
         handler.handle(body, signature)
     except InvalidSignatureError:
